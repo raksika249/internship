@@ -25,9 +25,9 @@ export default function Login() {
       );
 
       localStorage.setItem("token", res.data.token);
-
       showPopup("Login successful!");
       setTimeout(() => navigate("/home"), 1000);
+
     } catch (err) {
       showPopup(err.response?.data?.message || "Login failed");
     }
@@ -36,9 +36,10 @@ export default function Login() {
   return (
     <>
       <Popup show={popup.show} message={popup.message} />
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+
+      <div className="min-h-screen flex justify-center items-center bg-gray-100">
         <div className="w-96 bg-white p-8 rounded shadow">
-          <h2 className="text-3xl font-bold mb-6 text-center">Login</h2>
+          <h2 className="text-2xl font-bold mb-4">Login</h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
@@ -60,17 +61,16 @@ export default function Login() {
             <button className="bg-blue-600 text-white p-2 rounded">
               Login
             </button>
-
-            <div className="flex justify-between text-sm">
-              <Link to="/forgot" className="text-blue-600">
-                Forgot Password?
-              </Link>
-
-              <Link to="/signup" className="text-blue-600">
-                Create Account
-              </Link>
-            </div>
           </form>
+
+          <div className="flex justify-between mt-3 text-sm">
+            <Link to="/forgot" className="text-blue-600">
+              Forgot Password?
+            </Link>
+            <Link to="/signup" className="text-blue-600">
+              Create Account
+            </Link>
+          </div>
         </div>
       </div>
     </>

@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Popup from "../components/Popup";
 
 export default function VerifyOTP() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email;
+
   const [otp, setOtp] = useState("");
   const [popup, setPopup] = useState({ show: false, message: "" });
 
@@ -15,15 +18,21 @@ export default function VerifyOTP() {
 
   const handleVerify = async () => {
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/verify-otp`,
-        { otp }
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/verify-otp",
+        { email, otp }
       );
 
+      const token = res.data.token;
+
       showPopup("OTP verified!");
-      setTimeout(() => navigate("/reset"), 1000);
-    } catch {
-      showPopup("Invalid OTP");
+
+      setTimeout(() => {
+        navigate("/reset", { state: { token } });
+      }, 1000);
+
+    } catch (err) {
+      showPopup(err.response?.data?.message || "Invalid OTP");
     }
   };
 
@@ -31,8 +40,8 @@ export default function VerifyOTP() {
     <>
       <Popup show={popup.show} message={popup.message} />
       <div className="min-h-screen flex justify-center items-center bg-gray-100">
-        <div className="max-w-md bg-white p-6 shadow rounded">
-          <h2 className="text-2xl font-bold mb-4">Verify OTP</h2>
+        <div className="w-96 bg-white p-6 shadow rounded">
+          <h2 className="text-xl font-bold mb-4">Verify OTP</h2>
 
           <input
             className="w-full p-2 border rounded mb-3"
@@ -42,7 +51,7 @@ export default function VerifyOTP() {
 
           <button
             onClick={handleVerify}
-            className="w-full p-2 bg-green-600 text-white rounded"
+            className="w-full bg-green-600 text-white p-2 rounded"
           >
             Verify OTP
           </button>

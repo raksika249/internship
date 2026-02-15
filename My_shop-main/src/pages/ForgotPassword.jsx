@@ -15,15 +15,16 @@ export default function ForgotPassword() {
 
   const handleSubmit = async () => {
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/forgot-password`,
-        { email }
-      );
+      await axios.post("http://localhost:5000/api/auth/forgot-password", { email });
 
       showPopup("OTP sent to email");
-      setTimeout(() => navigate("/verify-otp"), 1000);
+
+      setTimeout(() => {
+        navigate("/verify-otp", { state: { email } });
+      }, 1000);
+
     } catch (err) {
-      showPopup("Error sending OTP");
+      showPopup(err.response?.data?.message || "Error sending OTP");
     }
   };
 
@@ -31,8 +32,8 @@ export default function ForgotPassword() {
     <>
       <Popup show={popup.show} message={popup.message} />
       <div className="min-h-screen flex justify-center items-center bg-gray-100">
-        <div className="max-w-md bg-white p-6 shadow rounded">
-          <h2 className="text-2xl font-bold mb-4">Forgot Password</h2>
+        <div className="w-96 bg-white p-6 shadow rounded">
+          <h2 className="text-xl font-bold mb-4">Forgot Password</h2>
 
           <input
             className="w-full p-2 border rounded mb-3"
@@ -42,7 +43,7 @@ export default function ForgotPassword() {
 
           <button
             onClick={handleSubmit}
-            className="w-full p-2 bg-blue-600 text-white rounded"
+            className="w-full bg-blue-600 text-white p-2 rounded"
           >
             Send OTP
           </button>
