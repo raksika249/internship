@@ -1,39 +1,84 @@
-import React from "react";
-import { useWishlist } from "../context/WishlistContext";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Popup from "../components/Popup";
 
 export default function Wishlist() {
-  const { wishlist, removeFromWishlist } = useWishlist();
+  const [wishlist, setWishlist] = useState([]);
+  const [popup, setPopup] = useState({ show: false, message: "" });
+
+  const token = localStorage.getItem("token");
+
+  const showPopup = (msg) => {
+    setPopup({ show: true, message: msg });
+    setTimeout(() => setPopup({ show: false, message: "" }), 2000);
+  };
+
+  const fetchWishlist = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/api/wishlist",
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      setWishlist(res.data.products);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchWishlist();
+  }, []);
+
+  const removeItem = async (productId) => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/wishlist/${productId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      showPopup("Removed from wishlist");
+      fetchWishlist();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="p-8">
+      <Popup show={popup.show} message={popup.message} />
+
       <h1 className="text-3xl font-bold mb-6">Your Wishlist</h1>
 
       {wishlist.length === 0 && <p>No items in wishlist.</p>}
 
-      {/* 5 cards per row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {wishlist.map((item) => (
           <div
-            key={item.id}
-            className="bg-white rounded-xl shadow hover:shadow-lg transition-all duration-300 p-3 max-w-[230px] w-full"
+            key={item._id}
+            className="bg-white rounded-xl shadow p-3"
           >
             <div className="w-full h-64 overflow-hidden rounded-md">
               <img
-                src={item.image}
+                src={`/assets/${item.image}`}
                 alt={item.name}
-                className="w-full h-full object-cover object-top"
+                className="w-full h-full object-cover"
               />
             </div>
 
-            <h3 className="mt-2 text-lg font-semibold text-gray-900">
+            <h3 className="mt-2 font-semibold">
               {item.name}
             </h3>
 
-            <p className="text-gray-600 text-sm">₹{item.price}</p>
+            <p>₹{item.price}</p>
 
             <button
-              onClick={() => removeFromWishlist(item.id)}
-              className="w-full mt-3 bg-red-500 hover:bg-red-600 text-white py-2 rounded text-sm"
+              onClick={() => removeItem(item._id)}
+              className="w-full mt-3 bg-red-500 text-white py-2 rounded"
             >
               Remove
             </button>

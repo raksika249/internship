@@ -26,8 +26,6 @@ import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 
 import { AuthProvider } from "./context/AuthContext";
-import { CartProvider } from "./context/CartContext";
-import { WishlistProvider } from "./context/WishlistContext";
 
 function Layout({ children }) {
   const location = useLocation();
@@ -53,8 +51,6 @@ function Layout({ children }) {
 export default function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <WishlistProvider>
           <BrowserRouter>
             <Layout>
               <Routes>
@@ -130,8 +126,6 @@ export default function App() {
               </Routes>
             </Layout>
           </BrowserRouter>
-        </WishlistProvider>
-      </CartProvider>
     </AuthProvider>
   );
 }

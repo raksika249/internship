@@ -9,17 +9,15 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  description: String,
-  image: String,
-  stock: Number,
-
+  image: {
+    type: String,
+    required: true
+  },
   category: {
     type: String,
-    enum: ["men", "women", "kids"],
-    required: true,
-    select: false   // 👈 hidden field
+    enum: ["women", "men", "kids"],
+    required: true
   }
-
 }, { timestamps: true });
 
 module.exports = mongoose.model("Product", productSchema);

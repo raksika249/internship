@@ -1,110 +1,140 @@
-const mongoose = require("mongoose")
-const Product = require("./src/models/Product")
-require("dotenv").config()
-
-const sampleProducts = [
-  // Men's Products
-  {
-    name: "Men's Cotton T-Shirt",
-    description: "Comfortable and durable cotton t-shirt for men",
-    price: 15.99,
-    category: "Men",
-    image: "https://via.placeholder.com/300?text=Men+Tshirt",
-    stock: 50,
-    rating: 4.5
-  },
-  {
-    name: "Men's Denim Jeans",
-    description: "Classic blue denim jeans for men",
-    price: 49.99,
-    category: "Men",
-    image: "https://via.placeholder.com/300?text=Men+Jeans",
-    stock: 30,
-    rating: 4.8
-  },
-  {
-    name: "Men's Formal Shirt",
-    description: "White formal shirt perfect for office",
-    price: 39.99,
-    category: "Men",
-    image: "https://via.placeholder.com/300?text=Men+Formal",
-    stock: 25,
-    rating: 4.3
-  },
-  // Women's Products
-  {
-    name: "Women's Saree",
-    description: "Elegant traditional silk saree for women",
-    price: 79.99,
-    category: "Women",
-    image: "https://via.placeholder.com/300?text=Women+Saree",
-    stock: 20,
-    rating: 4.9
-  },
-  {
-    name: "Women's Kurti",
-    description: "Comfortable cotton kurti for casual wear",
-    price: 29.99,
-    category: "Women",
-    image: "https://via.placeholder.com/300?text=Women+Kurti",
-    stock: 40,
-    rating: 4.6
-  },
-  {
-    name: "Women's Lehenga",
-    description: "Beautiful embroidered lehenga set",
-    price: 99.99,
-    category: "Women",
-    image: "https://via.placeholder.com/300?text=Women+Lehenga",
-    stock: 15,
-    rating: 4.7
-  },
-  // Kids Products
-  {
-    name: "Kids T-Shirt",
-    description: "Colorful and comfortable t-shirt for kids",
-    price: 12.99,
-    category: "Kids",
-    image: "https://via.placeholder.com/300?text=Kids+Tshirt",
-    stock: 60,
-    rating: 4.4
-  },
-  {
-    name: "Kids Shorts",
-    description: "Breathable shorts for active kids",
-    price: 18.99,
-    category: "Kids",
-    image: "https://via.placeholder.com/300?text=Kids+Shorts",
-    stock: 45,
-    rating: 4.5
-  },
-  {
-    name: "Kids Ethnic Wear",
-    description: "Traditional ethnic dress for kids",
-    price: 45.99,
-    category: "Kids",
-    image: "https://via.placeholder.com/300?text=Kids+Ethnic",
-    stock: 20,
-    rating: 4.8
-  }
-]
+require("dotenv").config();
+const mongoose = require("mongoose");
+const connectDB = require("./src/config/db");
+const Product = require("./src/models/Product");
 
 const seedProducts = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI)
-    console.log("Connected to MongoDB")
+    await connectDB();
 
-    await Product.deleteMany({})
-    console.log("Cleared existing products")
+    // Clear old products
+    await Product.deleteMany();
 
-    const inserted = await Product.insertMany(sampleProducts)
-    console.log(`Successfully inserted ${inserted.length} products`)
+    const products = [
+      // ---------------- WOMEN ----------------
+      {
+        name: "Kurti 1",
+        price: 699,
+        image: "https://via.placeholder.com/300x400?text=Kurti+1",
+        category: "women"
+      },
+      {
+        name: "Kurti 2",
+        price: 799,
+        image: "https://via.placeholder.com/300x400?text=Kurti+2",
+        category: "women"
+      },
+      {
+        name: "Kurti 3",
+        price: 899,
+        image: "https://via.placeholder.com/300x400?text=Kurti+3",
+        category: "women"
+      },
+      {
+        name: "Kurti 4",
+        price: 999,
+        image: "https://via.placeholder.com/300x400?text=Kurti+4",
+        category: "women"
+      },
+      {
+        name: "Kurti 5",
+        price: 1099,
+        image: "https://via.placeholder.com/300x400?text=Kurti+5",
+        category: "women"
+      },
+      {
+        name: "Kurti 6",
+        price: 1199,
+        image: "https://via.placeholder.com/300x400?text=Kurti+6",
+        category: "women"
+      },
 
-    process.exit(0)
+      // ---------------- MEN ----------------
+      {
+        name: "Men Dress 1",
+        price: 899,
+        image: "https://via.placeholder.com/300x400?text=Men+1",
+        category: "men"
+      },
+      {
+        name: "Men Dress 2",
+        price: 999,
+        image: "https://via.placeholder.com/300x400?text=Men+2",
+        category: "men"
+      },
+      {
+        name: "Men Dress 3",
+        price: 1099,
+        image: "https://via.placeholder.com/300x400?text=Men+3",
+        category: "men"
+      },
+      {
+        name: "Men Dress 4",
+        price: 1199,
+        image: "https://via.placeholder.com/300x400?text=Men+4",
+        category: "men"
+      },
+      {
+        name: "Men Dress 5",
+        price: 1299,
+        image: "https://via.placeholder.com/300x400?text=Men+5",
+        category: "men"
+      },
+      {
+        name: "Men Dress 6",
+        price: 1399,
+        image: "https://via.placeholder.com/300x400?text=Men+6",
+        category: "men"
+      },
+
+      // ---------------- KIDS ----------------
+      {
+        name: "Kids Dress 1",
+        price: 499,
+        image: "https://via.placeholder.com/300x400?text=Kids+1",
+        category: "kids"
+      },
+      {
+        name: "Kids Dress 2",
+        price: 599,
+        image: "https://via.placeholder.com/300x400?text=Kids+2",
+        category: "kids"
+      },
+      {
+        name: "Kids Dress 3",
+        price: 699,
+        image: "https://via.placeholder.com/300x400?text=Kids+3",
+        category: "kids"
+      },
+      {
+        name: "Kids Dress 4",
+        price: 799,
+        image: "https://via.placeholder.com/300x400?text=Kids+4",
+        category: "kids"
+      },
+      {
+        name: "Kids Dress 5",
+        price: 899,
+        image: "https://via.placeholder.com/300x400?text=Kids+5",
+        category: "kids"
+      },
+      {
+        name: "Kids Dress 6",
+        price: 999,
+        image: "https://via.placeholder.com/300x400?text=Kids+6",
+        category: "kids"
+      }
+    ];
+
+    await Product.insertMany(products);
+
+    console.log("✅ Products Seeded Successfully!");
+    process.exit();
+
   } catch (error) {
-    console.error("Error seeding products:", error)
-    process.exit(1)
+    console.error("❌ Seeding Error:", error);
+    process.exit(1);
   }
-}
+};
 
-seedProducts()
+seedProducts();

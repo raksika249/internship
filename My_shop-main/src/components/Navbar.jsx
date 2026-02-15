@@ -1,21 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useCart } from "../context/CartContext";
-import { useWishlist } from "../context/WishlistContext";
+import axios from "axios";
 
 export default function Navbar() {
-  const { logout } = useAuth();
-  const { cart } = useCart();
-  const { wishlist } = useWishlist();
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const cartRes = await axios.get(
+          "http://localhost:5000/api/cart",
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        const wishRes = await axios.get(
+          "http://localhost:5000/api/wishlist",
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        setCartCount(cartRes.data.items.length);
+        setWishlistCount(wishRes.data.products.length);
+
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCounts();
+  }, []);
 
   return (
     <nav className="w-full flex justify-between p-4 bg-white shadow items-center">
       <h2 className="text-2xl font-bold text-black">MyShop</h2>
 
       <div className="flex gap-6 items-center text-black">
-
-        {/* FIXED: Women goes to /home */}
         <Link to="/home" className="hover:text-blue-600 font-semibold">
           Women
         </Link>
@@ -29,17 +54,16 @@ export default function Navbar() {
         </Link>
 
         <Link to="/wishlist" className="hover:text-blue-600 font-semibold">
-          Wishlist ({wishlist.length})
+          Wishlist ({wishlistCount})
         </Link>
 
         <Link to="/cart" className="hover:text-blue-600 font-semibold">
-          Cart ({cart.length})
+          Cart ({cartCount})
         </Link>
 
         <Link to="/profile" className="hover:text-blue-600 font-semibold">
           Profile
         </Link>
-
       </div>
     </nav>
   );

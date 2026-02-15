@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const generateOTP = require("../utils/generateOTP");
 const generateToken = require("../utils/generateToken");
 const { sendEmail } = require("../services/emailService");
+const jwt = require("jsonwebtoken");
 
 exports.signup = async (req, res) => {
   try {
@@ -27,7 +28,7 @@ exports.signup = async (req, res) => {
     res.status(201).json({ message: "User registered successfully" });
 
   } catch (error) {
-    console.error(error);
+    console.error("Signup Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -49,6 +50,7 @@ exports.login = async (req, res) => {
     res.json({ message: "Login successful", token });
 
   } catch (error) {
+    console.error("Login Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -56,6 +58,9 @@ exports.login = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
+
+    if (!email)
+      return res.status(400).json({ message: "Email is required" });
 
     const user = await User.findOne({ email });
     if (!user)
@@ -71,16 +76,19 @@ exports.forgotPassword = async (req, res) => {
       expiresAt: new Date(Date.now() + 5 * 60 * 1000)
     });
 
+    // SEND EMAIL
     await sendEmail(
       email,
       "Password Reset OTP",
       `Your OTP is ${otp}`
     );
 
-    res.json({ message: "OTP sent to email" });
+    console.log("OTP sent:", otp); // for testing
+
+    res.json({ message: "OTP sent successfully" });
 
   } catch (error) {
-    console.error(error);
+    console.error("Forgot Password Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -89,6 +97,9 @@ exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
+    if (!email || !otp)
+      return res.status(400).json({ message: "Email and OTP required" });
+
     const record = await OTP.findOne({ email, otp });
     if (!record)
       return res.status(400).json({ message: "Invalid OTP" });
@@ -96,11 +107,16 @@ exports.verifyOTP = async (req, res) => {
     if (record.expiresAt < new Date())
       return res.status(400).json({ message: "OTP expired" });
 
-    const token = generateToken({ email }, "10m");
+    const token = jwt.sign(
+      { email },
+      process.env.JWT_SECRET,
+      { expiresIn: "10m" }
+    );
 
     res.json({ message: "OTP verified", token });
 
   } catch (error) {
+    console.error("Verify OTP Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -109,12 +125,14 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
-    const decoded = require("jsonwebtoken").verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    if (!token || !newPassword)
+      return res.status(400).json({ message: "Token and new password required" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findOne({ email: decoded.email });
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
@@ -122,6 +140,7 @@ exports.resetPassword = async (req, res) => {
     res.json({ message: "Password reset successful" });
 
   } catch (error) {
+    console.error("Reset Password Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
